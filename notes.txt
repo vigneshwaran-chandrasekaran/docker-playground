@@ -10,6 +10,15 @@ docker-compose logs kafka
 Check Node.js Application Logs
 docker-compose logs web
 -----------------------------------------------------------------
+to stop all running docker containers   
+docker stop $(docker ps -a -q)
 
-
+-----------------------------------------------------------------
+to delete no needed images based on id
+docker rmi cc0f0fa250c5
+-----------------------------------------------------------------
+docker-compose logs web
+docker-compose logs kafka
+docker-compose logs zookeeper
+docker-compose logs kafka-ui
 -----------------------------------------------------------------

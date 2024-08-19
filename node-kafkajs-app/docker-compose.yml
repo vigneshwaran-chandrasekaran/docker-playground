@@ -18,16 +18,22 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       ALLOW_PLAINTEXT_LISTENER: "yes"
 
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - kafka
+      - zookeeper
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+
   web:
     build: .
     ports:
       - "3302:3302"
     depends_on:
       - kafka
-
-  kafka-ui:
-    image: landoop/kafka-topics-ui:latest
-    ports:
-      - "8000:8000"
-    environment:
-      - KAFKA_REST_PROXY_URL=http://kafka:8082

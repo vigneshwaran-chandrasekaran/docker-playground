@@ -12,9 +12,9 @@ const kafka = new Kafka({
   brokers: ["kafka:9092"],
 });
 
-const topic = 'topic-test'
+const topic = "topic-test";
 const producer = kafka.producer();
-const consumer = kafka.consumer({ groupId: 'test-group' })
+const consumer = kafka.consumer({ groupId: "test-group" });
 
 const run = async () => {
   // Producing
@@ -25,6 +25,7 @@ const run = async () => {
     //   console.log(batch)
     // },
     eachMessage: async ({ topic, partition, message }) => {
+      console.log("kafka consumer message received");
       const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`;
       console.log(`- ${prefix} ${message.key}#${message.value}`);
     },

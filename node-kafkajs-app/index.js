@@ -31,7 +31,10 @@ app.post("/send", async (req, res) => {
 // API to start consuming Kafka messages
 app.get("/consume", async (req, res) => {
   await consumer.connect();
-  await consumer.subscribe({ topic: "test-topic", fromBeginning: true });
+  await consumer.subscribe({
+    topics: ["topic1", "topic2", "topic3"], // List of topics to subscribe
+    fromBeginning: true,
+  });
 
   consumer.run({
     eachMessage: async ({ topic, partition, message }) => {

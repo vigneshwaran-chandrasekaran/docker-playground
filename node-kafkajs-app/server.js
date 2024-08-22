@@ -17,8 +17,17 @@ const producer = kafka.producer();
 const consumer = kafka.consumer({ groupId: "test-group" });
 let isSubscribed = false; // Flag to track subscription
 
+// Register event listeners for connect and disconnect
+producer.on("producer.connect", () => {
+  console.log("Producer connected to Kafka!");
+});
+
+producer.on("producer.disconnect", () => {
+  console.log("Producer disconnected from Kafka.");
+});
+
 const run = async () => {
-  // start consuming Kafka messages
+  // Connect the producer
   await producer.connect();
   const topics = ["topic-test", "consume-topic"];
   // List of topics to subscribe

@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "express": "^4.19.2",
-    "kafkajs": "^2.2.4"
+    "kafkajs": "^2.2.4",
+    "nanoid": "^5.0.7"
   },
   "scripts": {
     "start": "node server.js"
@@ -9,7 +10,6 @@
   "name": "kafkajs-app",
   "version": "1.0.0",
   "main": "server.js",
-  "devDependencies": {},
   "keywords": [],
   "author": "",
   "license": "ISC",

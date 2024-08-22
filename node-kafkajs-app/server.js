@@ -1,5 +1,6 @@
 const express = require("express");
 const { Kafka } = require("kafkajs");
+const { nanoid } = require("nanoid");
 
 const app = express();
 const port = 3302;
@@ -15,48 +16,46 @@ const kafka = new Kafka({
 const producer = kafka.producer();
 const consumer = kafka.consumer({ groupId: "test-group" });
 let isSubscribed = false; // Flag to track subscription
-console.log("one isSubscribed", isSubscribed);
 
 const run = async () => {
   // start consuming Kafka messages
   await producer.connect();
-  console.log("two isSubscribed", isSubscribed);
   const topics = ["topic-test", "consume-topic"];
   // List of topics to subscribe
 
+  // Check if already subscribed
   if (!isSubscribed) {
-    // Check if already subscribed
-
     await consumer.subscribe({
       topics,
       fromBeginning: true,
     });
     isSubscribed = true; // Set flag after subscribing
-
     console.log(`Subscribed to topics: ${topics}`);
   } else {
-    console.log("Already subscribed to the topic.");
+    console.log("Already subscribed to the topics.");
   }
-  console.log("three isSubscribed", isSubscribed);
   await consumer.run({
     eachBatch: async ({ batch }) => {
-      console.log(batch);
+      console.log("batch", batch);
     },
     eachMessage: async ({ topic, partition, message }) => {
       if (topic === "topic-test") {
-        console.log("1111111111111 topic-test");
+        console.log("topic-test received");
       } else if (topic === "consume-topic") {
-        console.log("22222222222 consume-topic");
+        console.log("consume-topic received");
       } else {
         console.log("unknown topic", topic);
       }
-      console.log("kafka consumer message received", message);
+      console.log("kafka consumer message received", JSON.stringify(message));
       const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`;
       console.log(`- ${prefix} ${message.key}#${message.value}`);
       console.log({
+        topic, // Identify from which topic the message comes from
         partition,
         offset: message.offset,
+        key: message.key ? message.key.toString() : null,
         value: message.value.toString(),
+        headers: message.headers,
       });
     },
   });
@@ -76,9 +75,29 @@ const run = async () => {
     }
     try {
       await producer.send({
-        topic: topic,
-        messages: [{ value: message }],
+        topic,
+        messages: [
+          {
+            key: nanoid(),
+            value: JSON.stringify(message),
+            headers: {
+              correlationId: "12345",
+              headerKey1: nanoid(),
+              headerKey2: "headerValue2",
+            },
+          },
+          {
+            key: nanoid(),
+            value: JSON.stringify(message),
+            headers: {
+              correlationId: "6789",
+              headerKey1: nanoid(),
+              headerKey2: "headerValue2",
+            },
+          },
+        ],
       });
+      console.log("Messages sent successfully!");
       res.status(200).json({
         topic,
         message,
